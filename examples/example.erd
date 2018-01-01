@@ -1,0 +1,63 @@
+[species]
+species_id :pk
+scientific_name :ak1
+diet
+can_move
+
+[stationary_species]
+species_id :pk :fk
+
+[moving_species]
+species_id :pk :fk
+limbs
+
+species =(can_move) stationary_species + moving_species
+
+[crawling_species]
+species_id :pk :fk
+ground_speed
+can_climb
+can_dig
+
+[flying_species]
+species_id :pk :fk
+flying_speed
+max_altitude
+
+[swimming_species]
+species_id :pk :fk
+swim_speed
+max_depth
+
+moving_species >: crawling_species + flying_species + swimming_species
+
+[biome]
+biome_id :pk
+temperature
+biome_type
+
+[surface_biome]
+biome_id :pk :fk
+altitude
+humidity
+
+[ocean_biome]
+biome_id :pk :fk
+depth
+salinity
+
+[underground_biome]
+biome_id :pk :fk
+
+biome =(biome_type) surface_biome + ocean_biome + underground_biome
+
+species "lives in" 1+:1+ biome "supports"
+
+[predation]
+predator/species_id :pk :fk
+prey/species_id :pk :fk
+biome_id :pk :fk
+
+species "is predator" 1:* predation "has predator"
+species "is prey" 1:* predation "has prey"
+biome "facilitates" 1:* predation "occurs in"

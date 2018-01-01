@@ -1,0 +1,27 @@
+whitespace = _{ " " | "\t" }
+linebreak = _{ "\n" | "\r\n" | "\r" }
+
+name = @{ ('a'..'z' | 'A'..'Z' | "_")+ }
+num = { ('0'..'9')+ }
+entity_name = _{ "[" ~ name ~ "]" }
+mod_pk = @{ "pk" }
+mod_fk = @{ "fk" }
+mod_null = @{ "null" }
+mod_ak = ${ "ak" ~ num }
+modifier = _{ ":" ~ (mod_pk | mod_fk | mod_null | mod_ak) }
+attribute = { (name ~ "/" ~ name | name) ~ modifier* }
+entity = { entity_name ~ (linebreak ~ attribute)* }
+
+card_exact = @{ num }
+card_at_least = ${ num ~ "+" }
+card_range = ${ num ~ ".." ~ num }
+card_any = { "*" }
+card = { card_range | card_at_least | card_exact | card_any }
+string = { (!"\"" ~ any)* }
+quoted = _{ "\"" ~ string ~ "\"" }
+binary_rel = { name ~ quoted ~ card ~ ":" ~ card ~ name ~ quoted }
+subtype_open = { name ~ ">:" ~ name ~ ("+" ~ name)* }
+subtype_closed = { name ~ "=" ~ "(" ~ name ~ ")" ~ name ~ ("+" ~ name)* }
+relationship = { binary_rel | subtype_open | subtype_closed }
+
+model = _{ linebreak* ~ ((entity | relationship) ~ linebreak+)* }
